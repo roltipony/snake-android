@@ -151,9 +151,10 @@ func _move():
 	
 	var new_head = segments[0] + direction
 	
-	# Wrap alrededor de bordes
-	new_head.x = posmod(new_head.x, grid_width)
-	new_head.y = posmod(new_head.y, grid_height)
+	# Colisión con paredes
+	if new_head.x < 0 or new_head.x >= grid_width or new_head.y < 0 or new_head.y >= grid_height:
+		_die()
+		return
 	
 	# Colisión con el propio cuerpo (skip tail ya que se mueve)
 	for i in range(segments.size() - 1):
