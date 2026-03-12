@@ -54,7 +54,6 @@ var min_swipe_distance: float = 30.0
 
 # Mejoras pre-partida
 var defense_percent: float = 0.0
-var has_ghost_body: bool = false
 var speed_boost_active: bool = false
 
 # Ref a EnemyManager para torretas
@@ -71,7 +70,6 @@ func apply_upgrades(evo_sys: Node):
 	if evo_sys == null:
 		return
 	defense_percent = evo_sys.get_defense_percent()
-	has_ghost_body = evo_sys.has_ghost_body()
 	speed_boost_active = evo_sys.has_speed_boost()
 
 func _ready():
@@ -228,11 +226,13 @@ func _move():
 			_die()
 			return
 	
-	if not has_ghost_body:
-		for i in range(segments.size() - 1):
-			if new_head == segments[i]:
-				_die()
-				return
+	for i in range(segments.size() - 1):
+		if new_head == segments[i]:
+			# Si ese segmento tiene ghost_segment, se puede atravesar
+			if segment_upgrades.has(i) and segment_upgrades[i]["effect_key"] == "ghost_segment":
+				continue
+			_die()
+			return
 	
 	if grow_count > 0:
 		segments.insert(0, new_head)

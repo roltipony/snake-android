@@ -327,8 +327,7 @@ func _on_snake_died():
 	game_over_screen.visible = true
 	await _wait_for_touch()
 	game_over_screen.visible = false
-	await _show_evolution_screen()
-	_start_game()
+	await _show_start_screen()
 
 func _on_ate_enemy():
 	if hud:
