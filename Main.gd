@@ -8,6 +8,8 @@ var game_over_screen: CanvasLayer
 
 var score: int = 0
 var is_playing: bool = false
+var evo_sys: Node = null
+var evo_screen: CanvasLayer = null
 
 const GRID_SIZE: int = 40
 
@@ -48,6 +50,11 @@ func _build_background():
 		grid_node.add_child(line)
 
 func _setup_nodes():
+	# Sistema de evolución (singleton de esta sesión)
+	evo_sys = Node.new()
+	evo_sys.set_script(load("res://EvolutionSystem.gd"))
+	add_child(evo_sys)
+	
 	# Serpiente
 	snake = Node2D.new()
 	snake.set_script(load("res://Snake.gd"))
@@ -194,9 +201,10 @@ func _show_start_screen():
 	
 	add_child(start_overlay)
 	
-	# Esperar toque para empezar
+	# Esperar toque para ir a evolución
 	await _wait_for_touch()
 	start_overlay.queue_free()
+	await _show_evolution_screen()
 	_start_game()
 
 var _waiting_for_touch: bool = false
@@ -207,15 +215,28 @@ func _wait_for_touch() -> void:
 		await get_tree().process_frame
 
 func _unhandled_input(event: InputEvent):
+	# No procesar mientras la pantalla de evolución está activa
+	if evo_screen != null:
+		return
 	if _waiting_for_touch:
 		if event is InputEventScreenTouch and event.pressed:
 			_waiting_for_touch = false
 		elif event is InputEventKey and event.pressed:
 			_waiting_for_touch = false
 
+func _show_evolution_screen() -> void:
+	evo_screen = CanvasLayer.new()
+	evo_screen.set_script(load("res://EvolutionScreen.gd"))
+	add_child(evo_screen)
+	evo_screen.setup(evo_sys)
+	await evo_screen.ready_to_play
+	evo_screen.queue_free()
+	evo_screen = null
+
 func _start_game():
 	score = 0
 	is_playing = true
+	snake.apply_upgrades(evo_sys)
 	snake.reset()
 	enemy_manager.setup(snake)
 	if hud:
@@ -238,8 +259,9 @@ func _on_snake_died():
 		score_lbl.text = "Score: %d" % score
 	game_over_screen.visible = true
 	
-	# Esperar toque para reiniciar
+	# Esperar toque luego ir a evolución
 	await _wait_for_touch()
+	await _show_evolution_screen()
 	_start_game()
 
 func _on_ate_enemy():

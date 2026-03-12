@@ -33,9 +33,21 @@ var segment_nodes: Array = []
 var touch_start: Vector2 = Vector2.ZERO
 var min_swipe_distance: float = 30.0
 
+# Mejoras activas (se aplican al llamar apply_upgrades)
+var defense_percent: float = 0.0
+var has_ghost_body: bool = false
+var speed_boost_active: bool = false
+
 signal health_changed(new_health, max_health)
 signal died()
 signal ate_enemy()
+
+func apply_upgrades(evo_sys: Node):
+	if evo_sys == null:
+		return
+	defense_percent = evo_sys.get_defense_percent()
+	has_ghost_body = evo_sys.has_ghost_body()
+	speed_boost_active = evo_sys.has_speed_boost()
 
 func _ready():
 	# Calcular grid según pantalla
@@ -43,8 +55,9 @@ func _ready():
 	grid_width = int(screen.x / GRID_SIZE)
 	grid_height = int(screen.y / GRID_SIZE)
 	
-	_initialize_snake()
-	emit_signal("health_changed", health, MAX_HEALTH)
+	# Empieza inactiva hasta que Main llame a reset()
+	is_alive = false
+	set_process(false)
 
 func _initialize_snake():
 	# Limpiar segmentos previos
@@ -157,10 +170,11 @@ func _move():
 		return
 	
 	# Colisión con el propio cuerpo (skip tail ya que se mueve)
-	for i in range(segments.size() - 1):
-		if new_head == segments[i]:
-			_die()
-			return
+	if not has_ghost_body:
+		for i in range(segments.size() - 1):
+			if new_head == segments[i]:
+				_die()
+				return
 	
 	# Mover segmentos
 	if grow_count > 0:
@@ -232,7 +246,8 @@ func eat_enemy():
 func take_damage(amount: int):
 	if not is_alive:
 		return
-	health -= amount
+	var actual = int(ceil(amount * (1.0 - defense_percent)))
+	health -= actual
 	health = max(health, 0)
 	emit_signal("health_changed", health, MAX_HEALTH)
 	
@@ -255,12 +270,14 @@ func _flash_red():
 
 func _die():
 	is_alive = false
+	set_process(false)
 	emit_signal("died")
 
 func reset():
 	is_alive = true
 	health = MAX_HEALTH
 	grow_count = 0
-	current_speed = INITIAL_SPEED
+	current_speed = INITIAL_SPEED * (0.6 if speed_boost_active else 1.0)
+	set_process(true)
 	_initialize_snake()
 	emit_signal("health_changed", health, MAX_HEALTH)
