@@ -110,8 +110,11 @@ func _shoot():
 	if not is_instance_valid(snake_ref):
 		return
 	
+	# start en coordenadas locales del enemy_manager (sin offset HUD)
 	var start = position + Vector2(GRID_SIZE / 2, GRID_SIZE / 2)
-	var target = snake_ref.get_head_world_pos()
+	# target: posición mundo de la cabeza, restar offset del parent para igualar espacio
+	var parent_offset = get_parent().position if get_parent() else Vector2.ZERO
+	var target = snake_ref.get_head_world_pos() + snake_ref.position - parent_offset
 	var dir = (target - start).normalized()
 	
 	if dir.length() < 0.01:

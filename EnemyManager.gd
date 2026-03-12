@@ -6,15 +6,23 @@ const BULLET_SPEED: float = 280.0
 # Spawn configuración
 const INITIAL_ENEMY_COUNT: int = 3
 const MAX_ENEMIES: int = 8
-const SPAWN_INTERVAL: float = 4.0
-
 var enemies: Array = []
 var bullets: Array = []
 var snake_ref: Node2D = null
 var spawn_timer: float = 0.0
+var elapsed_time: float = 0.0
 var grid_width: int = 0
 var grid_height: int = 0
 var score: int = 0
+
+# Spawn interval decreases over time: starts at 4s, min 1s
+const SPAWN_INTERVAL_START: float = 4.0
+const SPAWN_INTERVAL_MIN: float = 1.0
+const SPAWN_RAMP_DURATION: float = 120.0  # segundos hasta llegar al mínimo
+
+func get_current_spawn_interval() -> float:
+	var t = clamp(elapsed_time / SPAWN_RAMP_DURATION, 0.0, 1.0)
+	return lerp(SPAWN_INTERVAL_START, SPAWN_INTERVAL_MIN, t)
 
 # Reservar espacio seguro alrededor del inicio de la serpiente
 const SAFE_RADIUS: int = 5
@@ -22,19 +30,31 @@ const SAFE_RADIUS: int = 5
 signal enemy_eaten(points)
 
 func _ready():
-	var screen = get_viewport_rect().size
-	grid_width = int(screen.x / GRID_SIZE)
-	grid_height = int(screen.y / GRID_SIZE)
+	pass  # grid_width y grid_height los fija Main.gd
 
 func setup(snake: Node2D):
+	# Limpiar todo antes de empezar partida nueva
+	for e in enemies:
+		if is_instance_valid(e):
+			e.queue_free()
+	enemies.clear()
+	for b in bullets:
+		if is_instance_valid(b):
+			b.queue_free()
+	bullets.clear()
+	score = 0
+	spawn_timer = 0.0
+	elapsed_time = 0.0
 	snake_ref = snake
-	# Spawn inicial
+	set_process(true)
 	for i in range(INITIAL_ENEMY_COUNT):
 		_spawn_enemy()
 
 func _process(delta: float):
+	elapsed_time += delta
 	spawn_timer += delta
-	if spawn_timer >= SPAWN_INTERVAL:
+	var interval = get_current_spawn_interval()
+	if spawn_timer >= interval:
 		spawn_timer = 0.0
 		if enemies.size() < MAX_ENEMIES:
 			_spawn_enemy()
@@ -122,13 +142,27 @@ func _on_bullet_fired(start_pos: Vector2, direction: Vector2, damage: int):
 	var bullet = Node2D.new()
 	bullet.set_script(load("res://Bullet.gd"))
 	get_tree().current_scene.add_child(bullet)
-	bullet.setup(start_pos, direction, BULLET_SPEED, damage, snake_ref)
+	# start_pos viene en coordenadas locales del enemy_manager, convertir a mundo
+	var world_pos = position + start_pos
+	bullet.setup(world_pos, direction, BULLET_SPEED, damage, snake_ref, false)
 	bullet.connect("hit_snake", _on_bullet_hit_snake)
 	bullets.append(bullet)
 
-func _on_bullet_hit_snake(damage_amount: int):
+func _on_bullet_hit_snake(damage_amount: int, segment_index: int):
 	if is_instance_valid(snake_ref):
-		snake_ref.take_damage(damage_amount)
+		if not snake_ref.is_alive:
+			return
+		snake_ref.take_damage(damage_amount, segment_index)
+
+func stop():
+	set_process(false)
+	# Detener todos los enemigos y balas activos
+	for e in enemies:
+		if is_instance_valid(e):
+			e.set_process(false)
+	for b in bullets:
+		if is_instance_valid(b):
+			b.set_process(false)
 
 func _on_enemy_eaten(grid_pos: Vector2i):
 	pass
@@ -145,10 +179,11 @@ func check_snake_eat_enemy() -> bool:
 			# ¡Comido!
 			var points = _get_enemy_points(e.enemy_type)
 			score += 1
+			var etype = e.enemy_type
 			e.destroy()
 			enemies.remove_at(i)
 			emit_signal("enemy_eaten", points)
-			snake_ref.eat_enemy()
+			snake_ref.eat_enemy(etype)
 			return true
 	
 	return false
