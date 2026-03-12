@@ -12,7 +12,7 @@ var play_btn_label: Label
 signal ready_to_play()
 
 func _ready():
-	pass
+	layer = 25
 
 func setup(evolution_system: Node):
 	evo_sys = evolution_system
@@ -32,7 +32,7 @@ func _build_ui():
 	title.position = Vector2(0, 30)
 	title.size = Vector2(screen.x, 50)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.text = "EVOLUCIÓN"
+	title.text = Loc.t("traits_title")
 	title.add_theme_color_override("font_color", Color(0.2, 0.9, 0.5))
 	title.add_theme_font_size_override("font_size", 36)
 	add_child(title)
@@ -41,7 +41,7 @@ func _build_ui():
 	subtitle.position = Vector2(0, 75)
 	subtitle.size = Vector2(screen.x, 28)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.text = "Equipa mejoras antes de jugar"
+	subtitle.text = Loc.t("traits_subtitle")
 	subtitle.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	subtitle.add_theme_font_size_override("font_size", 15)
 	add_child(subtitle)
@@ -101,7 +101,7 @@ func _build_ui():
 	play_btn_label.size = play_btn.size
 	play_btn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	play_btn_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	play_btn_label.text = "▶  JUGAR"
+	play_btn_label.text = Loc.t("traits_play")
 	play_btn_label.add_theme_color_override("font_color", Color.WHITE)
 	play_btn_label.add_theme_font_size_override("font_size", 26)
 	play_btn.add_child(play_btn_label)
@@ -143,7 +143,7 @@ func _build_upgrade_card(upg: Dictionary, y: float, screen_w: float):
 	name_lbl.name = "NameLabel"
 	name_lbl.position = Vector2(70, 10)
 	name_lbl.size = Vector2(card_w - 80, 30)
-	name_lbl.text = upg["name"]
+	name_lbl.text = Loc.t(upg["name_key"])
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
 	name_lbl.add_theme_font_size_override("font_size", 18)
 	card.add_child(name_lbl)
@@ -152,7 +152,7 @@ func _build_upgrade_card(upg: Dictionary, y: float, screen_w: float):
 	var desc_lbl = Label.new()
 	desc_lbl.position = Vector2(70, 42)
 	desc_lbl.size = Vector2(card_w - 80, 55)
-	desc_lbl.text = upg["description"]
+	desc_lbl.text = Loc.t(upg["desc_key"])
 	desc_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75))
 	desc_lbl.add_theme_font_size_override("font_size", 13)
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -163,7 +163,7 @@ func _build_upgrade_card(upg: Dictionary, y: float, screen_w: float):
 	cost_lbl.name = "CostLabel"
 	cost_lbl.position = Vector2(14, 100)
 	cost_lbl.size = Vector2(120, 28)
-	cost_lbl.text = "⚙️ %d EP" % upg["cost"]
+	cost_lbl.text = "⚙️ %d TP" % upg["cost"]
 	cost_lbl.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2))
 	cost_lbl.add_theme_font_size_override("font_size", 14)
 	card.add_child(cost_lbl)
@@ -181,7 +181,7 @@ func _build_upgrade_card(upg: Dictionary, y: float, screen_w: float):
 	eq_lbl.size = Vector2(130, 34)
 	eq_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	eq_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	eq_lbl.text = "EQUIPAR" if not is_eq else "QUITAR"
+	eq_lbl.text = Loc.t("traits_unequip") if is_eq else Loc.t("traits_equip")
 	eq_lbl.add_theme_color_override("font_color", Color.WHITE)
 	eq_lbl.add_theme_font_size_override("font_size", 15)
 	eq_btn.add_child(eq_lbl)
@@ -213,13 +213,13 @@ func _refresh_cards():
 		if eq_btn and eq_lbl:
 			if is_eq:
 				eq_btn.color = Color(0.6, 0.1, 0.1)
-				eq_lbl.text = "QUITAR"
+				eq_lbl.text = Loc.t("traits_unequip")
 			elif can_eq:
 				eq_btn.color = Color(0.1, 0.5, 0.8)
-				eq_lbl.text = "EQUIPAR"
+				eq_lbl.text = Loc.t("traits_equip")
 			else:
 				eq_btn.color = Color(0.25, 0.25, 0.25)
-				eq_lbl.text = "SIN EP"
+				eq_lbl.text = Loc.t("traits_no_points")
 		
 		# Actualizar rect del botón para input
 		if eq_btn:
@@ -229,7 +229,7 @@ func _refresh_points_label():
 	var used = evo_sys.get_points_used()
 	var remaining = evo_sys.get_points_remaining()
 	var max_ep = evo_sys.MAX_EVOLUTION_POINTS
-	points_label.text = "Evolution Points:  %d / %d  (disponibles: %d)" % [used, max_ep, remaining]
+	points_label.text = Loc.t("traits_points", [used, max_ep, remaining])
 	if remaining == 0:
 		points_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
 	else:

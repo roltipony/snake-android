@@ -41,7 +41,7 @@ func _build_hud():
 	score_label = Label.new()
 	score_label.position = Vector2(10, 6)
 	score_label.size = Vector2(w * 0.5, 26)
-	score_label.text = "SCORE: 0"
+	score_label.text = Loc.t("hud_score", [0])
 	score_label.add_theme_color_override("font_color", Color.WHITE)
 	score_label.add_theme_font_size_override("font_size", 20)
 	add_child(score_label)
@@ -50,7 +50,7 @@ func _build_hud():
 	level_label.position = Vector2(w * 0.5, 6)
 	level_label.size = Vector2(w * 0.5 - 8, 26)
 	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	level_label.text = "NVL 1"
+	level_label.text = Loc.t("hud_level", [1])
 	level_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1))
 	level_label.add_theme_font_size_override("font_size", 20)
 	add_child(level_label)
@@ -80,7 +80,7 @@ func _build_hud():
 	health_label.position = Vector2(32, 34)
 	health_label.size = Vector2(w - 42, 20)
 	health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	health_label.text = "100/100"
+	health_label.text = Loc.t("hud_hp", [100, 100])
 	health_label.add_theme_color_override("font_color", Color.WHITE)
 	health_label.add_theme_font_size_override("font_size", 11)
 	add_child(health_label)
@@ -110,7 +110,7 @@ func _build_hud():
 	xp_label.position = Vector2(32, 57)
 	xp_label.size = Vector2(w - 42, 20)
 	xp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	xp_label.text = "0 / 50 XP"
+	xp_label.text = Loc.t("hud_xp", [0, 50])
 	xp_label.add_theme_color_override("font_color", Color.WHITE)
 	xp_label.add_theme_font_size_override("font_size", 11)
 	add_child(xp_label)
@@ -142,17 +142,17 @@ func update_health(current: int, maximum: int):
 		health_fill.color = Color(0.9, 0.75, 0.0)
 	else:
 		health_fill.color = Color(0.9, 0.1, 0.1)
-	health_label.text = "%d/%d" % [current, maximum]
+	health_label.text = Loc.t("hud_hp", [current, maximum])
 
 func update_xp(current: int, needed: int, level: int):
 	var w = get_viewport().get_visible_rect().size.x - 42
 	var pct = float(current) / float(needed)
 	xp_fill.size.x = w * pct
-	xp_label.text = "%d / %d XP" % [current, needed]
-	level_label.text = "NVL %d" % level
+	xp_label.text = Loc.t("hud_xp", [current, needed])
+	level_label.text = Loc.t("hud_level", [level])
 
 func update_score(new_score: int):
-	score_label.text = "SCORE: %d" % new_score
+	score_label.text = Loc.t("hud_score", [new_score])
 
 func show_message(text: String, color: Color):
 	message_label.text = text

@@ -71,8 +71,7 @@ func _spawn_enemy():
 	if pos == Vector2i(-1, -1):
 		return
 	
-	var enemy = Node2D.new()
-	enemy.set_script(load("res://Enemy.gd"))
+	var enemy = load("res://Enemy.gd").new()
 	add_child(enemy)
 	
 	# Elegir tipo según score
@@ -139,8 +138,7 @@ func _choose_enemy_type():
 			return 2  # TANK
 
 func _on_bullet_fired(start_pos: Vector2, direction: Vector2, damage: int):
-	var bullet = Node2D.new()
-	bullet.set_script(load("res://Bullet.gd"))
+	var bullet = load("res://Bullet.gd").new()
 	get_tree().current_scene.add_child(bullet)
 	# start_pos viene en coordenadas locales del enemy_manager, convertir a mundo
 	var world_pos = position + start_pos

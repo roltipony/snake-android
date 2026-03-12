@@ -2,19 +2,20 @@ extends Node
 
 const MAX_EVOLUTION_POINTS: int = 100
 
+# Traits use Loc keys for name/description
 const UPGRADES = {
 	"armor": {
 		"id": "armor",
-		"name": "Escamas Reforzadas",
-		"description": "Reduce el daño recibido un 20%.\nDefensa por porcentaje contra ataques.",
+		"name_key": "trait_armor_name",
+		"desc_key":  "trait_armor_desc",
 		"cost": 50,
 		"icon": "🛡️",
 		"color": Color(0.3, 0.6, 1.0),
 	},
 	"speed_boost": {
 		"id": "speed_boost",
-		"name": "Adrenalina",
-		"description": "La serpiente empieza la partida\ncon mayor velocidad de movimiento.",
+		"name_key": "trait_speed_name",
+		"desc_key":  "trait_speed_desc",
 		"cost": 50,
 		"icon": "⚡",
 		"color": Color(1.0, 0.85, 0.1),
@@ -50,11 +51,10 @@ func toggle_upgrade(upgrade_id: String) -> bool:
 	if equipped[upgrade_id]:
 		equipped[upgrade_id] = false
 		return true
-	else:
-		if can_equip(upgrade_id):
-			equipped[upgrade_id] = true
-			return true
-		return false
+	if can_equip(upgrade_id):
+		equipped[upgrade_id] = true
+		return true
+	return false
 
 func is_equipped(upgrade_id: String) -> bool:
 	return equipped.get(upgrade_id, false)
@@ -66,4 +66,4 @@ func has_speed_boost() -> bool:
 	return is_equipped("speed_boost")
 
 func has_ghost_body() -> bool:
-	return false  # Ya no existe como mejora global
+	return false

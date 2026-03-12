@@ -10,6 +10,7 @@ var chosen: Dictionary = {}
 signal upgrade_chosen(upgrade_data)
 
 func _ready():
+	layer = 28
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func show_choices(db: Node, two_choices: Array):
@@ -31,7 +32,7 @@ func _build_ui():
 	title.position = Vector2(0, screen.y * 0.1)
 	title.size = Vector2(screen.x, 44)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.text = "¡NIVEL SUPERIOR!"
+	title.text = Loc.t("levelup_title")
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.1))
 	title.add_theme_font_size_override("font_size", 32)
 	add_child(title)
@@ -40,7 +41,7 @@ func _build_ui():
 	sub.position = Vector2(0, screen.y * 0.1 + 46)
 	sub.size = Vector2(screen.x, 28)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.text = "Elige una mejora para tu nuevo segmento"
+	sub.text = Loc.t("levelup_subtitle")
 	sub.add_theme_color_override("font_color", Color(0.75, 0.75, 0.75))
 	sub.add_theme_font_size_override("font_size", 15)
 	add_child(sub)
@@ -103,7 +104,7 @@ func _build_card(upg: Dictionary, w: float, h: float, x: float, y: float, idx: i
 	var name_lbl = Label.new()
 	name_lbl.position = Vector2(80, 18)
 	name_lbl.size = Vector2(w - 90, 30)
-	name_lbl.text = upg["name"]
+	name_lbl.text = Loc.t(upg["name_key"])
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
 	name_lbl.add_theme_font_size_override("font_size", 20)
 	card.add_child(name_lbl)
@@ -121,7 +122,7 @@ func _build_card(upg: Dictionary, w: float, h: float, x: float, y: float, idx: i
 	var desc_lbl = Label.new()
 	desc_lbl.position = Vector2(80, 74)
 	desc_lbl.size = Vector2(w - 92, 80)
-	desc_lbl.text = upg["description"]
+	desc_lbl.text = Loc.t(upg["desc_key"])
 	desc_lbl.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8))
 	desc_lbl.add_theme_font_size_override("font_size", 14)
 	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -138,7 +139,7 @@ func _build_card(upg: Dictionary, w: float, h: float, x: float, y: float, idx: i
 	btn_lbl.size = btn.size
 	btn_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	btn_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	btn_lbl.text = "ELEGIR"
+	btn_lbl.text = Loc.t("levelup_pick")
 	btn_lbl.add_theme_color_override("font_color", Color.WHITE)
 	btn_lbl.add_theme_font_size_override("font_size", 16)
 	btn.add_child(btn_lbl)

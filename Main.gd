@@ -5,14 +5,14 @@ const HUD_HEIGHT: int = 90   # píxeles reservados para el HUD en la parte super
 
 var snake: Node2D
 var enemy_manager: Node2D
-var hud: CanvasLayer
-var game_over_screen: CanvasLayer
-var levelup_screen: CanvasLayer = null
+var hud
+var game_over_screen
+var levelup_screen = null
 
 var score: int = 0
 var is_playing: bool = false
 var evo_sys: Node = null
-var evo_screen: CanvasLayer = null
+var evo_screen = null
 var upgrade_db: Node = null
 
 var _waiting_for_touch: bool = false
@@ -57,12 +57,10 @@ func _build_background():
 
 # ─────────────────────────────────────────────────────
 func _setup_nodes():
-	upgrade_db = Node.new()
-	upgrade_db.set_script(load("res://SegmentUpgradeDB.gd"))
+	upgrade_db = load("res://SegmentUpgradeDB.gd").new()
 	add_child(upgrade_db)
 
-	evo_sys = Node.new()
-	evo_sys.set_script(load("res://EvolutionSystem.gd"))
+	evo_sys = load("res://EvolutionSystem.gd").new()
 	add_child(evo_sys)
 
 	# Serpiente: desplazada hacia abajo por el HUD
@@ -71,8 +69,7 @@ func _setup_nodes():
 	var gw = int(screen.x / GRID_SIZE)
 	var gh = int((screen.y - HUD_HEIGHT) / GRID_SIZE)
 
-	snake = Node2D.new()
-	snake.set_script(load("res://Snake.gd"))
+	snake = load("res://Snake.gd").new()
 	snake.position = Vector2(0, HUD_HEIGHT)
 	add_child(snake)
 	snake.grid_width = gw
@@ -84,8 +81,7 @@ func _setup_nodes():
 	snake.connect("ate_enemy_signal", _on_ate_enemy)
 	snake.connect("turret_fire", _on_turret_fire)
 
-	enemy_manager = Node2D.new()
-	enemy_manager.set_script(load("res://EnemyManager.gd"))
+	enemy_manager = load("res://EnemyManager.gd").new()
 	enemy_manager.position = Vector2(0, HUD_HEIGHT)
 	add_child(enemy_manager)
 	enemy_manager.grid_width = gw
@@ -95,8 +91,7 @@ func _setup_nodes():
 	# Dar ref cruzada para torretas
 	snake.enemy_manager_ref = enemy_manager
 
-	hud = CanvasLayer.new()
-	hud.set_script(load("res://HUD.gd"))
+	hud = load("res://HUD.gd").new()
 	hud.layer = 10
 	hud.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(hud)
@@ -121,7 +116,7 @@ func _build_game_over_screen():
 	title.position = Vector2(0, screen.y * 0.28)
 	title.size = Vector2(screen.x, 60)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.text = "GAME OVER"
+	title.text = Loc.t("gameover_title")
 	title.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
 	title.add_theme_font_size_override("font_size", 48)
 	game_over_screen.add_child(title)
@@ -148,7 +143,7 @@ func _build_game_over_screen():
 	tip.position = Vector2(0, screen.y * 0.58)
 	tip.size = Vector2(screen.x, 30)
 	tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tip.text = "¡Come enemigos para subir de nivel!"
+	tip.text = Loc.t("gameover_tip")
 	tip.add_theme_color_override("font_color", Color(0.6, 0.85, 0.6))
 	tip.add_theme_font_size_override("font_size", 15)
 	game_over_screen.add_child(tip)
@@ -163,7 +158,7 @@ func _build_game_over_screen():
 	btn_lbl.size = Vector2(220, 60)
 	btn_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	btn_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	btn_lbl.text = "CONTINUAR"
+	btn_lbl.text = Loc.t("gameover_btn")
 	btn_lbl.add_theme_color_override("font_color", Color.WHITE)
 	btn_lbl.add_theme_font_size_override("font_size", 24)
 	btn.add_child(btn_lbl)
@@ -184,7 +179,7 @@ func _show_start_screen():
 	title.position = Vector2(0, screen.y * 0.18)
 	title.size = Vector2(screen.x, 80)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.text = "SNAKE\nEATER"
+	title.text = Loc.t("menu_title")
 	title.add_theme_color_override("font_color", Color(0.2, 0.9, 0.3))
 	title.add_theme_font_size_override("font_size", 52)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -194,7 +189,7 @@ func _show_start_screen():
 	desc.position = Vector2(20, screen.y * 0.42)
 	desc.size = Vector2(screen.x - 40, 80)
 	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc.text = "Come enemigos para ganar XP\nSube de nivel y elige mejoras\nDesliza para moverte"
+	desc.text = Loc.t("menu_desc")
 	desc.add_theme_color_override("font_color", Color(0.82, 0.82, 0.82))
 	desc.add_theme_font_size_override("font_size", 17)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -210,7 +205,7 @@ func _show_start_screen():
 	btn_lbl.size = Vector2(220, 65)
 	btn_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	btn_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	btn_lbl.text = "JUGAR"
+	btn_lbl.text = Loc.t("menu_play")
 	btn_lbl.add_theme_color_override("font_color", Color.WHITE)
 	btn_lbl.add_theme_font_size_override("font_size", 28)
 	start_btn.add_child(btn_lbl)
@@ -237,10 +232,9 @@ func _unhandled_input(event: InputEvent):
 			_waiting_for_touch = false
 
 func _show_evolution_screen() -> void:
-	evo_screen = CanvasLayer.new()
-	evo_screen.layer = 25
-	evo_screen.set_script(load("res://EvolutionScreen.gd"))
+	evo_screen = load("res://EvolutionScreen.gd").new()
 	add_child(evo_screen)
+	await get_tree().process_frame
 	evo_screen.setup(evo_sys)
 	await evo_screen.ready_to_play
 	evo_screen.queue_free()
@@ -277,7 +271,7 @@ func _on_xp_changed(cur_xp: int, xp_needed: int, level: int):
 
 func _on_leveled_up(new_level: int, _seg_idx: int):
 	if hud:
-		hud.show_message("¡NIVEL %d!" % new_level, Color(1.0, 0.85, 0.1))
+		hud.show_message("LEVEL %d!" % new_level, Color(1.0, 0.85, 0.1))
 	await get_tree().create_timer(0.25).timeout
 	_set_game_paused(true)
 	await _show_levelup_screen()
@@ -302,16 +296,14 @@ func _set_game_paused(paused: bool):
 
 func _show_levelup_screen() -> void:
 	var choices = upgrade_db.pick_two_random()
-	levelup_screen = CanvasLayer.new()
-	levelup_screen.layer = 28
+	levelup_screen = load("res://LevelUpScreen.gd").new()
 	levelup_screen.process_mode = Node.PROCESS_MODE_ALWAYS
-	levelup_screen.set_script(load("res://LevelUpScreen.gd"))
 	add_child(levelup_screen)
+	await get_tree().process_frame
 	levelup_screen.show_choices(upgrade_db, choices)
 	var chosen = await levelup_screen.upgrade_chosen
 	levelup_screen.queue_free()
 	levelup_screen = null
-	# Aplicar al segmento nuevo
 	snake.apply_segment_upgrade(chosen)
 
 func _on_snake_died():
@@ -320,10 +312,10 @@ func _on_snake_died():
 		enemy_manager.stop()
 	var score_lbl = game_over_screen.get_node_or_null("ScoreLabel")
 	if score_lbl:
-		score_lbl.text = "Score: %d" % score
+		score_lbl.text = Loc.t("gameover_score", [score])
 	var lvl_lbl = game_over_screen.get_node_or_null("LevelLabel")
 	if lvl_lbl:
-		lvl_lbl.text = "Nivel alcanzado: %d" % snake.current_level
+		lvl_lbl.text = Loc.t("gameover_level", [snake.current_level])
 	game_over_screen.visible = true
 	await _wait_for_touch()
 	game_over_screen.visible = false
@@ -331,7 +323,7 @@ func _on_snake_died():
 
 func _on_ate_enemy():
 	if hud:
-		hud.show_message("+XP  +VIDA", Color(0.3, 1.0, 0.5))
+		hud.show_message(Loc.t("hud_xp_gain"), Color(0.3, 1.0, 0.5))
 
 func _on_enemy_eaten_score(points: int):
 	score += points
@@ -342,8 +334,7 @@ func _on_enemy_eaten_score(points: int):
 # Torretas
 # ─────────────────────────────────────────────────────
 func _on_turret_fire(start_pos: Vector2, dir: Vector2, dmg: int):
-	var bullet = Node2D.new()
-	bullet.set_script(load("res://Bullet.gd"))
+	var bullet = load("res://Bullet.gd").new()
 	add_child(bullet)
 	# start_pos ya viene en coordenadas locales del snake (sin offset HUD)
 	# lo convertimos a mundo sumando el offset de snake
