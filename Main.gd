@@ -236,6 +236,7 @@ func _start_campaign(level_index: int):
 	score               = 0
 	is_playing          = true
 	current_level_index = level_index
+	hud.set_campaign_mode(true)
 	snake.apply_upgrades(evo_sys)
 	snake.reset()
 	enemy_manager.campaign_mode = true
@@ -249,6 +250,7 @@ func _start_campaign(level_index: int):
 func _start_horde():
 	score      = 0
 	is_playing = true
+	hud.set_campaign_mode(false)
 	snake.apply_upgrades(evo_sys)
 	snake.reset()
 	enemy_manager.campaign_mode = false
@@ -327,18 +329,16 @@ func _set_paused(paused: bool):
 # LEVEL WON
 # ─────────────────────────────────────────────────────
 func _on_level_won():
-	is_playing = false
+	# Parar TODO inmediatamente
+	_set_paused(true)
 	enemy_manager.stop()
 	mode_manager.stop()
+	is_playing = false
 	var lvl_name = level_db.get_level(current_level_index).get(
 		"name", "Level %d" % (current_level_index + 1))
 	await _show_victory_screen(lvl_name)
-	var next = current_level_index + 1
-	if next < level_db.get_level_count():
-		await _show_evolution_screen()
-		_start_campaign(next)
-	else:
-		await _show_menu()
+	# Volver siempre a la selección de nivel
+	await _show_campaign_select()
 
 # ─────────────────────────────────────────────────────
 # GAME OVER

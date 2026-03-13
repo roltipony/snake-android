@@ -13,6 +13,7 @@ var xp_fill: ColorRect
 var xp_label: Label
 var score_label: Label
 var level_label: Label
+var is_campaign: bool = false
 var message_label: Label
 var objective_label: Label
 var message_timer: float = 0.0
@@ -40,11 +41,12 @@ func _build_hud():
 
 	# ── Fila 1: Score | Nivel ──────────────────────────
 	score_label = Label.new()
-	score_label.position = Vector2(10, 6)
-	score_label.size = Vector2(w * 0.5, 26)
+	score_label.position = Vector2(6, 4)
+	score_label.size = Vector2(w - 12, 28)
 	score_label.text = Loc.t("hud_score", [0])
 	score_label.add_theme_color_override("font_color", Color.WHITE)
-	score_label.add_theme_font_size_override("font_size", 20)
+	score_label.add_theme_font_size_override("font_size", 18)
+	score_label.clip_text = false
 	add_child(score_label)
 
 	level_label = Label.new()
@@ -162,8 +164,23 @@ func update_xp(current: int, needed: int, level: int):
 	xp_label.text = Loc.t("hud_xp", [current, needed])
 	level_label.text = Loc.t("hud_level", [level])
 
+func set_campaign_mode(campaign: bool):
+	is_campaign = campaign
+
 func update_score(new_score: int):
-	score_label.text = Loc.t("hud_score", [new_score])
+	if not is_campaign:
+		score_label.text = Loc.t("hud_score", [new_score])
+
+func update_objective(text: String):
+	if is_campaign:
+		score_label.text = text
+		score_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.4))
+		# legacy objective_label hidden in campaign
+		if objective_label: objective_label.visible = false
+		return
+	if objective_label:
+		objective_label.text = text
+		objective_label.visible = text != ""
 
 func show_message(text: String, color: Color):
 	message_label.text = text
@@ -171,8 +188,3 @@ func show_message(text: String, color: Color):
 	message_label.visible = true
 	message_label.modulate.a = 1.0
 	message_timer = MESSAGE_DURATION
-
-func update_objective(text: String):
-	if objective_label:
-		objective_label.text = text
-		objective_label.visible = text != ""
