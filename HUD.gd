@@ -14,6 +14,7 @@ var xp_label: Label
 var score_label: Label
 var level_label: Label
 var message_label: Label
+var objective_label: Label
 var message_timer: float = 0.0
 const MESSAGE_DURATION: float = 1.4
 
@@ -115,6 +116,16 @@ func _build_hud():
 	xp_label.add_theme_font_size_override("font_size", 11)
 	add_child(xp_label)
 
+	# ── Objetivo (campaign) ──────────────────────────
+	objective_label = Label.new()
+	objective_label.position = Vector2(0, screen.y - 30)
+	objective_label.size = Vector2(screen.x, 26)
+	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	objective_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.5))
+	objective_label.add_theme_font_size_override("font_size", 13)
+	objective_label.visible = false
+	add_child(objective_label)
+
 	# ── Mensaje flotante ───────────────────────────────
 	message_label = Label.new()
 	message_label.position = Vector2(0, screen.y / 2 - 30)
@@ -160,3 +171,8 @@ func show_message(text: String, color: Color):
 	message_label.visible = true
 	message_label.modulate.a = 1.0
 	message_timer = MESSAGE_DURATION
+
+func update_objective(text: String):
+	if objective_label:
+		objective_label.text = text
+		objective_label.visible = text != ""
