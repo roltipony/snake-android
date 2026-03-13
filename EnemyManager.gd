@@ -157,7 +157,10 @@ func _on_bullet_fired(start_pos: Vector2, direction: Vector2, damage: int):
 
 func _on_bullet_hit_snake(damage_amount: int, segment_index: int):
 	if is_instance_valid(snake_ref) and snake_ref.is_alive:
-		snake_ref.take_damage(damage_amount, segment_index)
+		var final_dmg = damage_amount
+		if segment_index == 0:  # cabeza: +50% daño
+			final_dmg = int(damage_amount * 1.5)
+		snake_ref.take_damage(final_dmg, segment_index)
 
 func _on_enemy_eaten(_grid_pos: Vector2i):
 	pass

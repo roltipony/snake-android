@@ -5,7 +5,7 @@ const GRID_SIZE: int = 40
 const BULLET_SPEED: float = 280.0
 const SHOOT_INTERVAL_MIN: float = 1.5
 const SHOOT_INTERVAL_MAX: float = 3.5
-const BULLET_DAMAGE: int = 15
+const BULLET_DAMAGE: int = 7
 const ENEMY_SIZE: float = 34.0
 
 # Tipos de enemigo
@@ -120,11 +120,11 @@ func _shoot():
 	if dir.length() < 0.01:
 		dir = Vector2(0, 1)
 	
-	var dmg = BULLET_DAMAGE
+	var dmg = BULLET_DAMAGE  # Basic: 7
 	if enemy_type == EnemyType.FAST_SHOOTER:
-		dmg = 8
+		dmg = 5   # Fast: rápido pero débil
 	elif enemy_type == EnemyType.TANK:
-		dmg = 25
+		dmg = 12  # Tank: fuerte pero lento
 	
 	emit_signal("bullet_fired", start, dir, dmg)
 
