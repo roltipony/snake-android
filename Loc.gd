@@ -57,6 +57,14 @@ const _STRINGS = {
 		"rarity_legendary": "Legendary",
 
 		# Ability names & descriptions
+		"ability_heal_name":    "Regeneration",
+		"ability_heal_desc":    "Eating an enemy heals extra HP.",
+		"ability_speed_name":   "Swift",
+		"ability_speed_desc":   "Slightly increases movement speed.",
+		"ability_armor_name":   "Plating",
+		"ability_armor_desc":   "Reduces damage taken by 15%.",
+		"ability_xp_name":      "Scholar",
+		"ability_xp_desc":      "Gain 20% bonus XP from all enemies.",
 		"ability_turret_name":  "Turret",
 		"ability_turret_desc":  "This segment fires at the\nclosest enemy periodically.",
 		"ability_wrap_name":    "Portal",
@@ -66,6 +74,19 @@ const _STRINGS = {
 		"ability_ghost_name":   "Ghost Segment",
 		"ability_ghost_desc":   "The snake can pass through\nitself at this segment.",
 
+
+		# Mode select
+		"mode_select_title":   "SELECT MODE",
+		"mode_campaign":       "CAMPAIGN",
+		"mode_campaign_desc":  "Story levels with objectives",
+		"mode_horde":          "HORDE",
+		"mode_horde_desc":     "Endless survival — beat your score",
+		"campaign_title":      "CAMPAIGN",
+		"back_btn":            "← BACK",
+		"victory_title":       "LEVEL COMPLETE!",
+		"victory_continue":    "CONTINUE",
+		"victory_score":       "Score: %d",
+		"victory_level":       "Snake Level: %d",
 		# Enemy types (future use)
 		"enemy_basic":      "Basic",
 		"enemy_fast":       "Fast Shooter",
@@ -118,6 +139,14 @@ const _STRINGS = {
 		"rarity_legendary": "Legendario",
 
 		# Nombres y descripciones de habilidades
+		"ability_heal_name":    "Regeneración",
+		"ability_heal_desc":    "Comer enemigos cura vida extra.",
+		"ability_speed_name":   "Veloz",
+		"ability_speed_desc":   "Aumenta ligeramente la velocidad.",
+		"ability_armor_name":   "Blindaje",
+		"ability_armor_desc":   "Reduce el daño recibido un 15%.",
+		"ability_xp_name":      "Estudioso",
+		"ability_xp_desc":      "Gana 20% más XP de todos los enemigos.",
 		"ability_turret_name":  "Torreta",
 		"ability_turret_desc":  "Este segmento dispara\nal enemigo más cercano.",
 		"ability_wrap_name":    "Portal",
@@ -127,6 +156,19 @@ const _STRINGS = {
 		"ability_ghost_name":   "Segmento Fantasma",
 		"ability_ghost_desc":   "La serpiente puede atravesarse\na sí misma en este segmento.",
 
+
+		# Selección de modo
+		"mode_select_title":   "SELECCIONAR MODO",
+		"mode_campaign":       "CAMPAÑA",
+		"mode_campaign_desc":  "Niveles con objetivos",
+		"mode_horde":          "HORDA",
+		"mode_horde_desc":     "Supervivencia infinita",
+		"campaign_title":      "CAMPAÑA",
+		"back_btn":            "← VOLVER",
+		"victory_title":       "¡NIVEL COMPLETADO!",
+		"victory_continue":    "CONTINUAR",
+		"victory_score":       "Puntuación: %d",
+		"victory_level":       "Nivel serpiente: %d",
 		# Tipos de enemigo
 		"enemy_basic":      "Básico",
 		"enemy_fast":       "Disparador Rápido",

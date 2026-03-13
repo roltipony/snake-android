@@ -52,9 +52,8 @@ var segment_nodes: Array = []
 var touch_start: Vector2 = Vector2.ZERO
 var min_swipe_distance: float = 30.0
 
-# Mejoras pre-partida
+# Bonuses calculados del pool activo de segmentos
 var defense_percent: float = 0.0
-var speed_boost_active: bool = false
 
 # Ref a EnemyManager para torretas
 var enemy_manager_ref: Node = null
@@ -66,11 +65,8 @@ signal died()
 signal ate_enemy_signal()
 signal turret_fire(start_pos, dir, damage)
 
-func apply_upgrades(evo_sys: Node):
-	if evo_sys == null:
-		return
-	defense_percent = evo_sys.get_defense_percent()
-	speed_boost_active = evo_sys.has_speed_boost()
+func apply_upgrades(_unused = null):
+	defense_percent = 0.0  # recalculated from segment effects
 
 func _ready():
 	# grid_width y grid_height los fija Main.gd antes de usar la serpiente
@@ -98,7 +94,7 @@ func _initialize_snake():
 	direction = Vector2i(1, 0)
 	next_direction = Vector2i(1, 0)
 	move_timer = 0.0
-	current_speed = INITIAL_SPEED * (0.6 if speed_boost_active else 1.0)
+	current_speed = INITIAL_SPEED
 
 func _create_segment_node(index: int) -> Node2D:
 	var seg = Node2D.new()
@@ -256,11 +252,18 @@ func _has_segment_upgrade(effect_key: String) -> bool:
 	return false
 
 func eat_enemy(enemy_type: int = 0):
-	health = min(health + HEAL_ON_EAT, max_health)
+	# Base heal
+	var bonus_heal = 0
+	var xp_multiplier = 1.0
+	for upg in segment_upgrades.values():
+		match upg.get("effect_key", ""):
+			"heal_segment": bonus_heal += 10
+			"xp_boost":     xp_multiplier += 0.20
+	health = min(health + HEAL_ON_EAT + bonus_heal, max_health)
 	emit_signal("health_changed", health, max_health)
 	emit_signal("ate_enemy_signal")
 	var xp_gain = XP_BY_ENEMY_TYPE[clamp(enemy_type, 0, XP_BY_ENEMY_TYPE.size() - 1)]
-	_add_xp(xp_gain)
+	_add_xp(int(xp_gain * xp_multiplier))
 
 func _add_xp(amount: int):
 	current_xp += amount
@@ -284,6 +287,14 @@ func apply_segment_upgrade(upgrade_data: Dictionary):
 	segment_upgrades[target_idx] = upgrade_data
 	if upgrade_data["effect_key"] == "turret":
 		turret_timers[target_idx] = 0.0
+	if upgrade_data["effect_key"] == "speed_segment":
+		# Each speed segment gives 8% speed boost (lower move_timer interval)
+		var speed_count = 0
+		for upg in segment_upgrades.values():
+			if upg.get("effect_key","") == "speed_segment":
+				speed_count += 1
+		current_speed = INITIAL_SPEED * pow(0.92, speed_count)
+		current_speed = max(current_speed, MIN_SPEED)
 	_update_segment_colors()
 
 func take_damage(amount: int, hit_segment_index: int = -1):
@@ -292,7 +303,13 @@ func take_damage(amount: int, hit_segment_index: int = -1):
 	if hit_segment_index >= 0 and segment_upgrades.has(hit_segment_index):
 		if segment_upgrades[hit_segment_index]["effect_key"] == "shield":
 			return
-	var actual = int(ceil(amount * (1.0 - defense_percent)))
+	# Count armor segments
+	var total_defense = defense_percent
+	for upg in segment_upgrades.values():
+		if upg.get("effect_key","") == "armor_segment":
+			total_defense += 0.15
+	total_defense = clamp(total_defense, 0.0, 0.75)
+	var actual = int(ceil(amount * (1.0 - total_defense)))
 	health -= actual
 	health = max(health, 0)
 	emit_signal("health_changed", health, max_health)

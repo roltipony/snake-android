@@ -11,7 +11,6 @@ var snake:         Node2D = null
 var enemy_manager: Node2D = null
 var hud:           Node   = null
 
-var evo_sys:      Node = null
 var upgrade_db:   Node = null
 var level_db:     Node = null
 var mode_manager: Node = null
@@ -78,7 +77,6 @@ func _build_background():
 
 func _setup_systems():
 	upgrade_db   = load("res://SegmentUpgradeDB.gd").new(); add_child(upgrade_db)
-	evo_sys      = load("res://EvolutionSystem.gd").new();  add_child(evo_sys)
 	level_db     = load("res://LevelData.gd").new();        add_child(level_db)
 	mode_manager = load("res://ModeManager.gd").new();      add_child(mode_manager)
 
@@ -181,11 +179,14 @@ func _show_campaign_select():
 
 func _show_evolution_screen():
 	_evo_done = false
-	evo_screen = load("res://EvolutionScreen.gd").new()
-	evo_screen.connect("ready_to_play", func(): _evo_done = true)
+	evo_screen = load("res://PoolSelectScreen.gd").new()
+	evo_screen.connect("pool_confirmed", func(pool):
+		upgrade_db.set_active_pool(pool)
+		_evo_done = true
+	)
 	_show_screen(evo_screen)
 	await get_tree().process_frame
-	evo_screen.setup(evo_sys)
+	evo_screen.setup(upgrade_db)
 	while not _evo_done:
 		await get_tree().process_frame
 	_clear_screen()
@@ -237,7 +238,6 @@ func _start_campaign(level_index: int):
 	is_playing          = true
 	current_level_index = level_index
 	hud.set_campaign_mode(true)
-	snake.apply_upgrades(evo_sys)
 	snake.reset()
 	enemy_manager.campaign_mode = true
 	enemy_manager.setup(snake)
@@ -251,7 +251,6 @@ func _start_horde():
 	score      = 0
 	is_playing = true
 	hud.set_campaign_mode(false)
-	snake.apply_upgrades(evo_sys)
 	snake.reset()
 	enemy_manager.campaign_mode = false
 	enemy_manager.setup(snake)
