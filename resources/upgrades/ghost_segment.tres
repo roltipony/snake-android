@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/UpgradeResource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ghost_segment"
+name_key = "ability_ghost_name"
+desc_key = "ability_ghost_desc"
+rarity = 3
+icon = "👻"
+segment_color = Color(0.55, 0.2, 0.85, 1)
+effect_key = "ghost_segment"

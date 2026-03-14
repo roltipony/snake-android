@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/UpgradeResource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "heal_segment"
+name_key = "ability_heal_name"
+desc_key = "ability_heal_desc"
+rarity = 0
+icon = "💊"
+segment_color = Color(0.2, 0.85, 0.45, 1)
+effect_key = "heal_segment"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/UpgradeResource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "turret"
+name_key = "ability_turret_name"
+desc_key = "ability_turret_desc"
+rarity = 1
+icon = "🔫"
+segment_color = Color(0.9, 0.3, 0.1, 1)
+effect_key = "turret"

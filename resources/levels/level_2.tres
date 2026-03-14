@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="LevelResource" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://resources/LevelResource.gd" id="1"]
+[ext_resource type="Script" path="res://resources/WaveEntry.gd" id="2"]
+
+[sub_resource type="Resource" id="wave_1"]
+script = ExtResource("2")
+delay = 0.0
+enemy_types = [0]
+enemy_counts = [3]
+repeat = true
+repeat_interval = 4.0
+
+[sub_resource type="Resource" id="wave_2"]
+script = ExtResource("2")
+delay = 8.0
+enemy_types = [1]
+enemy_counts = [1]
+repeat = true
+repeat_interval = 6.0
+
+[resource]
+script = ExtResource("1")
+id = "level_2"
+display_name = "Level 2  —  Sharpshooters"
+description = "Kill 10 enemies.\nFast shooters appear."
+enemy_waves = [SubResource("wave_1"), SubResource("wave_2")]
+win_type_1 = "kill_total"
+win_value_1 = 10
+use_win_condition_2 = false

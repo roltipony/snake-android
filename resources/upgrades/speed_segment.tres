@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/UpgradeResource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "speed_segment"
+name_key = "ability_speed_name"
+desc_key = "ability_speed_desc"
+rarity = 0
+icon = "⚡"
+segment_color = Color(1.0, 0.9, 0.1, 1)
+effect_key = "speed_segment"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/EnemyData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Basic"
+damage = 7
+shoot_interval_min = 2.0
+shoot_interval_max = 3.5
+body_color = Color(0.9, 0.2, 0.2, 1)
+pulse_color = Color(1.0, 0.5, 0.3, 1)
+points = 10
+size_ratio = 0.85

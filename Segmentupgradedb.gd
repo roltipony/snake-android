@@ -2,11 +2,28 @@ extends Node
 
 # =====================================================
 # SEGMENT UPGRADE DB
-# Añadir mejoras nuevas: copiar una entrada de ALL_UPGRADES.
-# Rarezas disponibles: COMMON, UNCOMMON, EPIC, LEGENDARY
+# Las mejoras ya no están hardcodeadas aquí.
+# Cada mejora es un archivo .tres en res://resources/upgrades/
+#
+# PARA AÑADIR UNA MEJORA NUEVA:
+#   1. Clic derecho en FileSystem → New Resource → UpgradeResource
+#   2. Rellena los campos en el Inspector
+#   3. Guarda como res://resources/upgrades/nombre.tres
+#   4. Añade la ruta al array UPGRADE_PATHS aquí abajo
 # =====================================================
 
 enum Rarity { COMMON, UNCOMMON, EPIC, LEGENDARY }
+
+const UPGRADE_PATHS: Array[String] = [
+	"res://resources/upgrades/heal_segment.tres",
+	"res://resources/upgrades/speed_segment.tres",
+	"res://resources/upgrades/armor_segment.tres",
+	"res://resources/upgrades/xp_boost.tres",
+	"res://resources/upgrades/turret.tres",
+	"res://resources/upgrades/wraparound.tres",
+	"res://resources/upgrades/shield.tres",
+	"res://resources/upgrades/ghost_segment.tres",
+]
 
 const RARITY_COLORS = {
 	Rarity.COMMON:    Color(0.65, 0.65, 0.65),
@@ -14,15 +31,12 @@ const RARITY_COLORS = {
 	Rarity.EPIC:      Color(0.65, 0.15, 0.9),
 	Rarity.LEGENDARY: Color(1.0,  0.55, 0.05),
 }
-
 const RARITY_KEYS = {
 	Rarity.COMMON:    "rarity_common",
 	Rarity.UNCOMMON:  "rarity_uncommon",
 	Rarity.EPIC:      "rarity_epic",
 	Rarity.LEGENDARY: "rarity_legendary",
 }
-
-# Peso para pick_two_random — sólo afecta a mejoras dentro del pool activo
 const RARITY_WEIGHTS = {
 	Rarity.COMMON:    60,
 	Rarity.UNCOMMON:  25,
@@ -30,96 +44,41 @@ const RARITY_WEIGHTS = {
 	Rarity.LEGENDARY: 3,
 }
 
-# Regla de composición del pool:
-# Para añadir mejoras de rareza superior necesitas mínimo este número de COMMON en el pool
-const COMMON_REQUIRED_FOR_UNCOMMON: int = 3
-const COMMON_REQUIRED_FOR_EPIC:     int = 3
-const COMMON_REQUIRED_FOR_LEGENDARY:int = 3
+const COMMON_REQUIRED_FOR_UNCOMMON:  int = 3
+const COMMON_REQUIRED_FOR_EPIC:      int = 3
+const COMMON_REQUIRED_FOR_LEGENDARY: int = 3
 
-const ALL_UPGRADES: Array = [
-	# ── COMMON ──────────────────────────────────────
-	{
-		"id": "heal_segment",
-		"name_key": "ability_heal_name",
-		"desc_key":  "ability_heal_desc",
-		"rarity": Rarity.COMMON,
-		"icon": "💊",
-		"segment_color": Color(0.2, 0.85, 0.45),
-		"effect_key": "heal_segment",
-	},
-	{
-		"id": "speed_segment",
-		"name_key": "ability_speed_name",
-		"desc_key":  "ability_speed_desc",
-		"rarity": Rarity.COMMON,
-		"icon": "⚡",
-		"segment_color": Color(1.0, 0.9, 0.1),
-		"effect_key": "speed_segment",
-	},
-	{
-		"id": "armor_segment",
-		"name_key": "ability_armor_name",
-		"desc_key":  "ability_armor_desc",
-		"rarity": Rarity.COMMON,
-		"icon": "🛡",
-		"segment_color": Color(0.55, 0.65, 0.75),
-		"effect_key": "armor_segment",
-	},
-	{
-		"id": "xp_boost",
-		"name_key": "ability_xp_name",
-		"desc_key":  "ability_xp_desc",
-		"rarity": Rarity.COMMON,
-		"icon": "✦",
-		"segment_color": Color(0.3, 0.5, 1.0),
-		"effect_key": "xp_boost",
-	},
-	# ── UNCOMMON ────────────────────────────────────
-	{
-		"id": "turret",
-		"name_key": "ability_turret_name",
-		"desc_key":  "ability_turret_desc",
-		"rarity": Rarity.UNCOMMON,
-		"icon": "🔫",
-		"segment_color": Color(0.9, 0.3, 0.1),
-		"effect_key": "turret",
-	},
-	# ── EPIC ────────────────────────────────────────
-	{
-		"id": "wraparound",
-		"name_key": "ability_wrap_name",
-		"desc_key":  "ability_wrap_desc",
-		"rarity": Rarity.EPIC,
-		"icon": "🌀",
-		"segment_color": Color(0.3, 0.8, 1.0),
-		"effect_key": "wraparound",
-	},
-	{
-		"id": "shield",
-		"name_key": "ability_shield_name",
-		"desc_key":  "ability_shield_desc",
-		"rarity": Rarity.EPIC,
-		"icon": "🛡",
-		"segment_color": Color(0.9, 0.85, 0.1),
-		"effect_key": "shield",
-	},
-	# ── LEGENDARY ───────────────────────────────────
-	{
-		"id": "ghost_segment",
-		"name_key": "ability_ghost_name",
-		"desc_key":  "ability_ghost_desc",
-		"rarity": Rarity.LEGENDARY,
-		"icon": "👻",
-		"segment_color": Color(0.55, 0.2, 0.85),
-		"effect_key": "ghost_segment",
-	},
-]
+# Array de dicts — mismo formato que antes para no romper PoolSelectScreen ni Snake
+var ALL_UPGRADES: Array = []
+
+var active_pool: Array = []
+
+func _ready():
+	_load_upgrades()
+
+func _load_upgrades():
+	ALL_UPGRADES.clear()
+	for path in UPGRADE_PATHS:
+		var res: UpgradeResource = load(path)
+		if res == null:
+			push_error("SegmentUpgradeDB: no se pudo cargar " + path)
+			continue
+		ALL_UPGRADES.append(_resource_to_dict(res))
+
+func _resource_to_dict(res: UpgradeResource) -> Dictionary:
+	return {
+		"id":            res.id,
+		"name_key":      res.name_key,
+		"desc_key":      res.desc_key,
+		"rarity":        res.rarity,
+		"icon":          res.icon,
+		"segment_color": res.segment_color,
+		"effect_key":    res.effect_key,
+	}
 
 # ─────────────────────────────────────────────────────
-# Pool activo — definido por el jugador en PoolSelectScreen
+# Pool activo
 # ─────────────────────────────────────────────────────
-var active_pool: Array = []   # Array de upgrade dicts
-
 func set_active_pool(pool: Array):
 	active_pool = pool.duplicate()
 
@@ -133,21 +92,8 @@ func count_commons_in_pool() -> int:
 			c += 1
 	return c
 
-func can_add_to_pool(upg: Dictionary) -> bool:
-	var r = upg["rarity"]
-	if r == Rarity.COMMON:
-		return true
-	var commons = count_commons_in_pool()
-	if r == Rarity.UNCOMMON:
-		return commons >= COMMON_REQUIRED_FOR_UNCOMMON
-	if r == Rarity.EPIC:
-		return commons >= COMMON_REQUIRED_FOR_EPIC
-	if r == Rarity.LEGENDARY:
-		return commons >= COMMON_REQUIRED_FOR_LEGENDARY
-	return false
-
 # ─────────────────────────────────────────────────────
-# Pick 2 del pool activo (para la pantalla de level up)
+# Pick 2 aleatorio ponderado del pool activo
 # ─────────────────────────────────────────────────────
 func pick_two_random() -> Array:
 	var pool = active_pool if not active_pool.is_empty() else ALL_UPGRADES
@@ -171,6 +117,9 @@ func pick_two_random() -> Array:
 		picked.append(pool[randi() % pool.size()])
 	return picked
 
+# ─────────────────────────────────────────────────────
+# Helpers
+# ─────────────────────────────────────────────────────
 func get_rarity_color(rarity: int) -> Color:
 	return RARITY_COLORS.get(rarity, Color.WHITE)
 
