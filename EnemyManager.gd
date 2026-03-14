@@ -30,6 +30,8 @@ var campaign_mode: bool  = false
 var spawn_timer:   float = 0.0
 var elapsed_time:  float = 0.0
 
+var tile_manager_ref: Node = null
+
 signal enemy_eaten(points)
 
 # ─────────────────────────────────────────────────────
@@ -130,6 +132,10 @@ func _find_valid_spawn() -> Vector2i:
 	for e in enemies:
 		if is_instance_valid(e):
 			occupied.append(e.get_grid_pos())
+	# Añadir tiles de obstáculos
+	if is_instance_valid(tile_manager_ref):
+		for t in tile_manager_ref.get_blocking_tiles():
+			occupied.append(t)
 
 	var head = snake_ref.get_head_grid_pos()
 

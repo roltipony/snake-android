@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="LevelResource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="LevelResource" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://resources/LevelResource.gd" id="1"]
 [ext_resource type="Script" path="res://resources/WaveEntry.gd" id="2"]
+[ext_resource type="Script" path="res://resources/TileEntry.gd" id="3"]
 
 [sub_resource type="Resource" id="wave_1"]
 script = ExtResource("2")
@@ -11,12 +12,38 @@ enemy_counts = [3]
 repeat = true
 repeat_interval = 5.0
 
+[sub_resource type="Resource" id="tile_1"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 3
+grid_y = 4
+
+[sub_resource type="Resource" id="tile_2"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 8
+grid_y = 9
+
+[sub_resource type="Resource" id="tile_3"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 4
+grid_y = 14
+
 [resource]
 script = ExtResource("1")
 id = "level_1"
 display_name = "Level 1  —  First Contact"
 description = "Survive 30 seconds.\nOnly basic enemies."
 enemy_waves = [SubResource("wave_1")]
+special_tiles = [SubResource("tile_1"), SubResource("tile_2"), SubResource("tile_3")]
 win_type_1 = "survive"
 win_value_1 = 30
+win_enemy_type_1 = 0
 use_win_condition_2 = false
+win_type_2 = "kill_total"
+win_value_2 = 0
+win_enemy_type_2 = 0

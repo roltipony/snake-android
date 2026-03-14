@@ -58,6 +58,9 @@ var defense_percent: float = 0.0
 # Ref a EnemyManager para torretas
 var enemy_manager_ref: Node = null
 
+# Ref a ObstacleManager para colisiones
+var tile_manager_ref: Node = null
+
 signal health_changed(new_health, max_health)
 signal xp_changed(current_xp, xp_needed, level)
 signal leveled_up(new_level, new_segment_index)
@@ -150,6 +153,7 @@ func _process(delta: float):
 		move_timer = 0.0
 		_move()
 	_process_turrets(delta)
+	_process_speed_buff(delta)
 
 func _process_turrets(delta: float):
 	for seg_idx in segment_upgrades.keys():
@@ -229,6 +233,12 @@ func _move():
 				continue
 			_die()
 			return
+
+	# Colisión / activación de tiles especiales
+	if is_instance_valid(tile_manager_ref):
+		if tile_manager_ref.check_and_apply(new_head, self):
+			_die()
+			return
 	
 	if grow_count > 0:
 		segments.insert(0, new_head)
@@ -296,6 +306,36 @@ func apply_segment_upgrade(upgrade_data: Dictionary):
 		current_speed = INITIAL_SPEED * pow(0.92, speed_count)
 		current_speed = max(current_speed, MIN_SPEED)
 	_update_segment_colors()
+
+# ─────────────────────────────────────────────────────
+# TILE BUFFS — llamados por TileManager
+# ─────────────────────────────────────────────────────
+func heal(amount: int) -> void:
+	if not is_alive:
+		return
+	health = min(health + amount, max_health)
+	emit_signal("health_changed", health, max_health)
+
+var _speed_buff_timer: float = 0.0
+var _speed_buff_active: bool = false
+var _speed_buff_original: float = 0.0
+
+func apply_speed_buff(multiplier: float, duration: float) -> void:
+	if not is_alive:
+		return
+	if not _speed_buff_active:
+		_speed_buff_original = current_speed
+	_speed_buff_active = true
+	_speed_buff_timer  = duration
+	current_speed = max(_speed_buff_original / multiplier, MIN_SPEED)
+
+func _process_speed_buff(delta: float) -> void:
+	if not _speed_buff_active:
+		return
+	_speed_buff_timer -= delta
+	if _speed_buff_timer <= 0.0:
+		_speed_buff_active = false
+		current_speed = _speed_buff_original
 
 func take_damage(amount: int, hit_segment_index: int = -1):
 	if not is_alive:

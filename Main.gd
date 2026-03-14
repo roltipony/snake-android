@@ -7,9 +7,10 @@ extends Node2D
 const GRID_SIZE:  int = 40
 const HUD_HEIGHT: int = 90
 
-var snake:         Node2D = null
-var enemy_manager: Node2D = null
-var hud:           Node   = null
+var snake:            Node2D = null
+var enemy_manager:    Node2D = null
+var tile_manager: Node2D = null
+var hud:              Node   = null
 
 var upgrade_db:   Node = null
 var level_db:     Node = null
@@ -107,6 +108,12 @@ func _setup_game_nodes():
 	snake.enemy_manager_ref = enemy_manager
 	mode_manager.setup(level_db, enemy_manager)
 	mode_manager.connect("level_won", _on_level_won)
+
+	tile_manager = load("res://TileManager.gd").new()
+	tile_manager.position = Vector2(0, HUD_HEIGHT)
+	add_child(tile_manager)
+	snake.tile_manager_ref = tile_manager
+	enemy_manager.tile_manager_ref = tile_manager
 
 func _setup_hud():
 	hud = load("res://HUD.gd").new()
@@ -238,6 +245,12 @@ func _start_campaign(level_index: int):
 	is_playing          = true
 	current_level_index = level_index
 	hud.set_campaign_mode(true)
+	# Cargar obstáculos del nivel
+	var lvl_res = level_db.get_level_resource(level_index)
+	if lvl_res and lvl_res.special_tiles.size() > 0:
+		tile_manager.setup(lvl_res.special_tiles)
+	else:
+		tile_manager.clear()
 	snake.reset()
 	enemy_manager.campaign_mode = true
 	enemy_manager.setup(snake)
@@ -251,6 +264,7 @@ func _start_horde():
 	score      = 0
 	is_playing = true
 	hud.set_campaign_mode(false)
+	tile_manager.clear()
 	snake.reset()
 	enemy_manager.campaign_mode = false
 	enemy_manager.setup(snake)

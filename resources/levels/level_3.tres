@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="LevelResource" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="LevelResource" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://resources/LevelResource.gd" id="1"]
 [ext_resource type="Script" path="res://resources/WaveEntry.gd" id="2"]
+[ext_resource type="Script" path="res://resources/TileEntry.gd" id="3"]
 
 [sub_resource type="Resource" id="wave_1"]
 script = ExtResource("2")
@@ -25,6 +26,7 @@ delay = 12.0
 enemy_types = [2]
 enemy_counts = [1]
 repeat = false
+repeat_interval = 5.0
 
 [sub_resource type="Resource" id="wave_4"]
 script = ExtResource("2")
@@ -32,6 +34,7 @@ delay = 28.0
 enemy_types = [2]
 enemy_counts = [1]
 repeat = false
+repeat_interval = 5.0
 
 [sub_resource type="Resource" id="wave_5"]
 script = ExtResource("2")
@@ -39,6 +42,42 @@ delay = 46.0
 enemy_types = [2]
 enemy_counts = [1]
 repeat = false
+repeat_interval = 5.0
+
+[sub_resource type="Resource" id="tile_1"]
+script = ExtResource("3")
+tile_type = 0
+shape = 2
+grid_x = 2
+grid_y = 4
+
+[sub_resource type="Resource" id="tile_2"]
+script = ExtResource("3")
+tile_type = 0
+shape = 2
+grid_x = 9
+grid_y = 8
+
+[sub_resource type="Resource" id="tile_3"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 5
+grid_y = 6
+
+[sub_resource type="Resource" id="tile_4"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 7
+grid_y = 15
+
+[sub_resource type="Resource" id="tile_5"]
+script = ExtResource("3")
+tile_type = 0
+shape = 0
+grid_x = 1
+grid_y = 11
 
 [resource]
 script = ExtResource("1")
@@ -46,7 +85,11 @@ id = "level_3"
 display_name = "Level 3  —  Tank Buster"
 description = "Kill 3 tanks.\nWatch out for backup."
 enemy_waves = [SubResource("wave_1"), SubResource("wave_2"), SubResource("wave_3"), SubResource("wave_4"), SubResource("wave_5")]
+special_tiles = [SubResource("tile_1"), SubResource("tile_2"), SubResource("tile_3"), SubResource("tile_4"), SubResource("tile_5")]
 win_type_1 = "kill_type"
 win_value_1 = 3
 win_enemy_type_1 = 2
 use_win_condition_2 = false
+win_type_2 = "kill_total"
+win_value_2 = 0
+win_enemy_type_2 = 0
